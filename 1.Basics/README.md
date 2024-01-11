@@ -126,3 +126,59 @@ kubectl delete pod <pod-name>
 # 4- Create the pod again from the file
 kubectl create -f temp-pod-defn.yml
 ```
+
+### Replication Controllers and Replica Sets
+
+* Short hand is "rs"
+* When pods die, they don't come back up automatically
+* Replication Controllers ensure that pods can be up and running if pods
+   get deleted.
+* They allow for load sharing within pods across multiple nodes in k8s
+  cluster
+* ReplicaSets are the new way to avoid the use cases as opposed to
+  Replication Controller
+
+![Alt Basics](./docs/images/replication-controller-basic-definition.png)
+
+![Alt Basics](./docs/images/replica-set-basic-definition.png)
+
+
+* Check if you are in right namespace
+* Check for the following
+  * label match between template and selector
+  * apiVersion is correct at all times as per the spec
+  * kind is correctly defined
+* Whenever a replica set is edited, delete the pods so it picks up
+   the new definition.
+* Check if it has the right image
+
+#### Commands
+```shell
+# Create a replicaset
+kubectl create -f <rs-file>.yml
+
+# Replace a replica set
+kubectl replace -f <rs-file>.yml
+
+# Imperative command to scale replicas from a file
+kubectl scale --replicas=<no> -f <file-name>.yml
+
+# Imperative command to scale an existing running replica
+# Note the object name is specified as "replicaset"
+kubectl scale --replicas=<no> replicaset <replica-name>
+
+# Finding the number of desired and replicasets
+kubectl get replicasets
+
+# Finding the number of replicaset
+# Note this will provide a count, count less than 1
+# Alternate is to use the get rs to find out and count it manually
+kubectl get rs | wc -l
+
+## Edit the replicaset directly
+# delete the pods to reflect the state of the
+# edited replicaset
+kubectl edit rs <rs-name>
+k delete po $(k get po  | grep <rs-name> | awk '{print $1}')
+```
+
